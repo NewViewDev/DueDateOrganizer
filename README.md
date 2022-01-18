@@ -12,7 +12,9 @@ Search through a file structure in order to find files starting with "TODO" and 
 TODO feels natural for me as a programmer, but eventually this will be changable in settings
 
 ## Style
-<img src="images/uglyUI.png" width="200">
+<div style="text-align:center">
+  <img src="images/uglyUI.png" width="400">
+</div>
 
 Definately not the prettiest application so far. I'll focus more on that once I have all the features I want
 
