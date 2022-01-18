@@ -1,0 +1,4 @@
+*.env
+usrData
+__pycache__/
+result.html
