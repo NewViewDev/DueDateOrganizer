@@ -1,6 +1,10 @@
 import sqlite3
 import os
+from dotenv import load_dotenv
+
 import scraper
+
+load_dotenv()
 
 #Setup a database with a given name and SQL layout
 #Returns created Database
@@ -42,7 +46,7 @@ def updateDate(database, path, date):
 
 #Adds all files labled TODO to database
 def updateFiles(database):
-    files = scraper.getTODOfiles(r"C:\Users\ULTRA\Documents\School")
+    files = scraper.getTODOfiles(os.getenv('folderSchool'))
     #Add any new TODO files to the database
     #Should remove old records too?
     for file in files:
