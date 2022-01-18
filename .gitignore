@@ -1,4 +1,5 @@
 *.env
-usrData
-__pycache__/
+/usrData/
+/__pycache__/
 result.html
+/compiled/

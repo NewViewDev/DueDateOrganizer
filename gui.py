@@ -12,8 +12,9 @@ import dataEdit as de
 hoverColor = "#abddff";
 # leaveColor = "white";
 
+
 selectedAssignment = None;
-database = de.initDatabase("./usrData/database.db", "schema.sql");
+database = de.initDatabase("./usrData/database.db", "./SQL/schema.sql");
 # database = de.initDatabase(":memory:", "schema.sql"); #For Testing
 
 #Custom Classes Start
@@ -74,7 +75,7 @@ def changeDate(cal, entry, path, oldDate, newDate):
     _, name, _ = de.updateDate(database, path, newDate);
     if oldDate != "Null":
         cal.calevent_remove(date=oldDate)
-    cal.calevent_create(newDate, name)
+    cal.calevent_create(newDate, name, "file")
     entry.set_date(newDate)
     return
 
@@ -85,6 +86,8 @@ def buttonSetup(button):
 
 #Setup tkinter window
 window = tk.Tk();
+style = ttk.Style()
+style.theme_use("winnative")
 window.title("Data Scrape")
 photo = tk.PhotoImage(file = "images/favicon.png")
 window.iconphoto(False, photo)
@@ -92,6 +95,7 @@ window.iconphoto(False, photo)
 #major frameCreation
 frameFiles = tk.Frame();
 frameCalendar = tk.Frame();
+frameEventView = tk.Frame();
 
 tk.Label(master = frameFiles, text = "Files Labled TODO:").pack()
 
@@ -101,6 +105,7 @@ data = de.getData(database)
 
 #create Calendar
 calendar = Calendar(frameCalendar, selectmode = 'day')
+calendar.tag_config("file", background="green")
 
 #create buttons and date selectors for each TODO file
 for path, name, date in data:
@@ -124,7 +129,7 @@ for path, name, date in data:
     if date != "Null":
         dateTimeObj = dateString.fromisoformat(date);
         dateEnt.set_date(dateTimeObj);
-        calendar.calevent_create(dateTimeObj, name)
+        calendar.calevent_create(dateTimeObj, name, "file")
     else:
         dateEnt.delete(0, "end");
     dateEnt.bind("<<DateEntrySelected>>", (lambda e, dateEnt=dateEnt : entryChange(dateEnt, calendar)))

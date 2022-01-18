@@ -1,0 +1,1 @@
+pyinstaller --hidden-import "babel.numbers" --add-data ../SQL/;./SQL/ --add-data ../images/favicon.png;./images/ --distpath ./compiled/dist --workpath ./compiled/build --specpath ./compiled/ --windowed gui.py
