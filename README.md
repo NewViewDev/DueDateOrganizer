@@ -1,4 +1,4 @@
-# Duedate Organizer
+# Due Date Organizer
 A way to put all of one's due dates in the same place
 
 ## Web Scraping 
