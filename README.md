@@ -11,3 +11,6 @@ TODO feels natural for me as a programmer, but eventually this will be changable
 
 ## Style
 Definately not the prettiest application so far. I'll focus more on that once I have all the features I want
+
+## Getting Started
+Please remember to add your information to your personal .env file for things to work. This is set to be ignored by git.
