@@ -43,16 +43,29 @@ def onExit(event):
 #For DateEntry elements
 def entryChange(entry, cal):
     oldDate = dateString.fromisoformat(de.pathData(entry.tag, database)[1])
-    changeDate(cal, entry, entry.tag, oldDate, entry.get_date())
+    changeDate(cal, entry, entry.tag, oldDate, entry.get_date()) #
     pass
 
 #For calendar day select
-def calClick(cal):
+def calClick(cal, eventList):
+    global selectedAssignment;
+    selectedDate = cal.selection_get()
+
+    #Clear eventList and add events if they exist
+    eventList.delete(0, "end")
+    eventIDs = cal.get_calevents(date=selectedDate)
+    for i in range(0, len(eventIDs)):
+        eventList.insert(i, cal.calevent_cget(eventIDs[i], "text"))
+        print(eventList.index(i))
+
     if selectedAssignment is not None:
         dateEnt = selectedAssignment.master.children["!tagdate"];
         oldDate = dateEnt.get_date()
-        newDate = cal.selection_get()
-        changeDate(cal, dateEnt, selectedAssignment.tag, oldDate, newDate);
+
+        changeDate(cal, dateEnt, selectedAssignment.tag, oldDate, selectedDate);
+        selectedAssignment["background"] = "systemButtonFace";
+        selectedAssignment = None;
+        # cal.selection_set(selectedDate)
 
     pass
 
@@ -73,8 +86,17 @@ def selectAssignment(event):
 #Helper method that changes date information on the calendar and updates the database
 def changeDate(cal, entry, path, oldDate, newDate):
     _, name, _ = de.updateDate(database, path, newDate);
+    fileName = os.path.basename(path);
+
     if oldDate != "Null":
-        cal.calevent_remove(date=oldDate)
+        eventIDs = cal.get_calevents(date=oldDate);
+        toRemove = "Null"
+        for ID in eventIDs:
+            eventName = cal.calevent_cget(ID, "text");
+            if(eventName == fileName):
+                toRemove = ID
+        cal.calevent_remove(toRemove, date=oldDate)
+
     cal.calevent_create(newDate, name, "file")
     entry.set_date(newDate)
     return
@@ -84,18 +106,35 @@ def buttonSetup(button):
     button.bind("<Enter>", onEnter)
     button.bind("<Leave>", onExit)
 
+#Handle double click on event list element
+def eventOpen(e):
+    list = e.widget;
+    selection = list.curselection()
+    # selection.
+    pass
+
 #Setup tkinter window
 window = tk.Tk();
-style = ttk.Style()
+menuBar = tk.Menu(window)
+# menuBar.add_command(label="Test", command=test)
+window.config(menu=menuBar)
+style = ttk.Style(window)
 style.theme_use("winnative")
 window.title("Data Scrape")
 photo = tk.PhotoImage(file = "images/favicon.png")
 window.iconphoto(False, photo)
 
 #major frameCreation
-frameFiles = tk.Frame();
-frameCalendar = tk.Frame();
-frameEventView = tk.Frame();
+frameFiles = tk.Frame(window);
+frameCalendar = tk.Frame(window);
+frameDayInfo = tk.Frame(window);
+
+#frameDayInfo code start
+tk.Label(master=frameDayInfo, text="Selected Day Info:").pack()
+eventList = tk.Listbox(master=frameDayInfo, width="40")
+eventList.bind("<Double-1>", (lambda e: eventOpen(e))) #os.startfile(path, "open")
+eventList.pack()
+#frameDayInfo code end
 
 tk.Label(master = frameFiles, text = "Files Labled TODO:").pack()
 
@@ -120,7 +159,7 @@ for path, name, date in data:
 
     buttonOpen = tk.Button(master = buttonFrame, text = "Open");
     buttonSetup(buttonOpen);
-    buttonOpen.bind("<Button-1>", (lambda e, name=name: os.startfile(name, "open")));
+    buttonOpen.bind("<Button-1>", (lambda e, path=path: os.startfile(path, "open")));
     buttonOpen.pack(side="left");
 
 
@@ -137,13 +176,15 @@ for path, name, date in data:
     buttonFrame.pack()
 
 
-calendar.bind("<<CalendarSelected>>", (lambda e: calClick(calendar)))
+calendar.bind("<<CalendarSelected>>", (lambda e: calClick(calendar, eventList)))
 
 tk.Label(master = frameCalendar, text = "Calendar:").pack()
 calendar.pack()
 
 #Pack completed frames
 frameFiles.pack(side="left")
+frameDayInfo.pack(side="right")
+# frameCalendar.place(relx=.5, rely=.5, anchor="center")
 frameCalendar.pack(side="right")
 
 window.mainloop();
